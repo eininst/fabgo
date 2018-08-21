@@ -13,7 +13,20 @@ import ConfigParser
 
 g = 'g'
 
-def deploy(runmode, module, section, branch):
+
+def test(module, branch, profile=g):
+    deploy('test', branch, module, profile)
+
+
+def stage(module, branch, profile=g):
+    deploy('stage', branch, module, profile)
+
+
+def prod(module, branch, profile=g):
+    deploy('prod', branch, module, profile)
+
+
+def deploy(runmode, branch, module, section):
     cf = _load_config(section, module)
     if not os.path.exists(cf.source_path):
         local('mkdir -p {}'.format(cf.source_path))
@@ -47,6 +60,7 @@ def deploy(runmode, module, section, branch):
         env.is_rollback = False
         env.branch = branch
 
+
 def start():
     _run()
 
@@ -55,11 +69,12 @@ def _run():
     cf = env.cf
     put_remote_path = '{}/{}'.format(cf.remote_path, _get_name_version(cf.app_name))
 
-    put_source_path = '{}/{}'.format(cf.module_path,  cf.app_name)
+    put_source_path = '{}/{}'.format(cf.module_path, cf.app_name)
 
     result = put(put_source_path, put_remote_path)
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
+
 
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
@@ -119,6 +134,7 @@ def _load_config(section, project):
     config.app_name = project
     return config
 
+
 def _load_package_config(cf):
     p1 = '{}/fabgo.yml'.format(cf.source_project_path)
     p2 = '{}/fabgo.yaml'.format(cf.source_project_path)
@@ -131,16 +147,19 @@ def _load_package_config(cf):
     else:
         _error(u'fabgo.yaml 不存在')
 
+
 def _load_yaml(path):
     with file(path, 'r') as file_stream:
         return yaml.load(file_stream)
+
 
 def _get_name_version(app_name):
     if 'bak_version' in env:
         return env.bak_version
     now = datetime.now()
-    env.bak_version = '{0}_{1}_{1}.tar.gz'.format(app_name,env.branch, now.strftime('%Y%m%d%H%M%S')[2:])
+    env.bak_version = '{0}_{1}_{1}.tar.gz'.format(app_name, env.branch, now.strftime('%Y%m%d%H%M%S')[2:])
     return env.bak_version
+
 
 def _error(msg):
     print red(u'_error: {}'.format(msg))
