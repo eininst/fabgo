@@ -39,6 +39,8 @@ def deploy(runmode, branch, module, section):
         local('git fetch;git checkout {};git pull'.format(branch))
         pack_cf = _load_package_config(cf)
         m = pack_cf.get(module)
+
+        print m
         if not m:
             _error(u'不存在"{}" 此项目'.format(module))
 
