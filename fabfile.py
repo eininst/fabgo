@@ -56,7 +56,7 @@ def deploy(runmode, branch, module, section):
         local('pwd')
         local('vgo clean && CC=gcc vgo build')
         local('tar czvf {0}.tar.gz {0}'.format(module))
-        env.hosts = host_list
+        env.hosts = ['localhost']
         env.user = cf.username
         env.password = cf.password
         env.cf = cf
