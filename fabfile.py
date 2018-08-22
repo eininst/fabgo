@@ -71,7 +71,7 @@ def start():
 
 def _run():
     cf = env.cf
-    put_remote_path = '{}/{}'.format(cf.remote_path, _get_name_version(cf.app_name))
+    put_remote_path = '{}/{}.tar.gz'.format(cf.remote_path, cf.app_name)
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
     if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(cf.remote_path))) == 0:
