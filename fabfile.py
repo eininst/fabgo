@@ -36,7 +36,7 @@ def deploy(runmode, branch, module, section):
         with lcd(cf.source_path):
             local('git clone {}'.format(cf.git_address))
 
-    with lcd(cf.source_project_path):
+    with lcd(cf.source_project_path + "/" + module):
         local('git fetch;git checkout {};git pull'.format(branch))
         pack_cf = _load_package_config(cf)
         m = pack_cf.get(module)
