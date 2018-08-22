@@ -55,7 +55,7 @@ def deploy(runmode, branch, module, section):
 
         local('pwd')
         local('vgo clean && CC=gcc vgo build')
-
+        local('tar czvf {0}.tar.gz {0}'.format(module))
         env.hosts = host_list
         env.user = cf.username
         env.password = cf.password
@@ -73,7 +73,7 @@ def _run():
     cf = env.cf
     put_remote_path = '{}/{}'.format(cf.remote_path, _get_name_version(cf.app_name))
 
-    put_source_path = '{}/{}.go'.format(cf.module_path, cf.app_name)
+    put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
     result = put(put_source_path, put_remote_path)
     if result.succeeded:
@@ -161,7 +161,7 @@ def _get_name_version(app_name):
     if 'bak_version' in env:
         return env.bak_version
     now = datetime.now()
-    env.bak_version = '{0}_{1}_{2}'.format(app_name, env.branch, now.strftime('%Y%m%d%H%M%S')[2:])
+    env.bak_version = '{0}_{1}_{2}.tar.gz'.format(app_name, env.branch, now.strftime('%Y%m%d%H%M%S')[2:])
     return env.bak_version
 
 
