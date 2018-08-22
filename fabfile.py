@@ -53,7 +53,7 @@ def deploy(runmode, branch, module, section):
         if not host_list:
             _error(u'无效的hosts')
 
-        local('vgo install && vgo build')
+        local('vgo clean && vgo build')
 
         env.hosts = host_list
         env.user = cf.username
