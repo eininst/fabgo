@@ -54,7 +54,7 @@ def deploy(runmode, branch, module, section):
             _error(u'无效的hosts')
 
         local('pwd')
-        local('vgo clean && vgo build')
+        local('vgo clean && CC=gcc vgo build')
 
         env.hosts = host_list
         env.user = cf.username
