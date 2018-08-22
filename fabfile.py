@@ -72,11 +72,11 @@ def start():
 def _run():
     cf = env.cf
     put_remote_path = '{}/{}'.format(cf.remote_path, _get_name_version(cf.app_name))
-
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
-    run('who')
-    run('pwd')
-    run('ls /root/sources/egg/mp/')
+
+    if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(cf.remote_path))) == 0:
+        run('mkdir -p {}'.format(cf.remote_path))
+
     result = put(put_source_path, put_remote_path)
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
