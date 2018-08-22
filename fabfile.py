@@ -74,7 +74,8 @@ def _run():
     put_remote_path = '{}/{}'.format(cf.remote_path, _get_name_version(cf.app_name))
 
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
-
+    run('who')
+    run('pwd')
     result = put(put_source_path, put_remote_path)
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
