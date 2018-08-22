@@ -77,7 +77,7 @@ def _run():
     run('who')
     run('pwd')
     run('ls /root/sources/egg/mp/')
-    result = put('/root/sources/egg/mp/mp.tar.gz', put_remote_path)
+    result = put(put_source_path, put_remote_path)
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
 
