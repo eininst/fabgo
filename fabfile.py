@@ -14,18 +14,14 @@ import ConfigParser
 
 g = 'g'
 
-
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
-
 
 def stage(module, branch, profile=g):
     deploy('stage', branch, module, profile)
 
-
 def prod(module, branch, profile=g):
     deploy('prod', branch, module, profile)
-
 
 def go():
     _run_go()
@@ -34,7 +30,7 @@ def ngo():
     _run_go()
     _run_nginx()
 
-def nginx():
+def n():
     _run_nginx()
 
 def deploy(runmode, branch, module, section):
