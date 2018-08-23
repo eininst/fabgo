@@ -74,7 +74,7 @@ def _run_go():
     cf = env.cf
     with lcd(cf.source_project_path + "/" + cf.app_name):
         local('vgo clean && CC=gcc vgo build')
-        local('tar czvf {0}.tar.gz {0} conf'.format(module))
+        local('tar czvf {0}.tar.gz {0} conf'.format(cf.app_name))
 
     put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
     put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
