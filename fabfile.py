@@ -117,6 +117,9 @@ def _run_nginx():
     if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
         return
 
+    if int(run('[ -e "{0}/conf/nginx/nginx.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 1:
+        run('cp -rf {0}/conf/nginx/nginx.conf {1}/conf/nginx.conf'.format(put_remote_path, cf.nginx_path))
+
     if int(run('[ -e "{0}/conf/app" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
         run('mkdir -p {0}/conf/app'.format(cf.nginx_path))
 
