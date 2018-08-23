@@ -96,7 +96,7 @@ def _run():
 
         r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path,cf.app_name) )
         if r:
-            r = r.replace('\n', ' ')
+            r = r.replace('\n\g', ' ')
             run('echo "{0}"'.format(r))
         # run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
         #     ,pty=False)
