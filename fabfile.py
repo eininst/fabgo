@@ -25,22 +25,19 @@ def prod(module, branch, profile=g):
 
 def go():
     _run_go()
-    end_time = int(round(time.time() * 1000))
-    print green(u'发布完成 耗时: %s秒' % round((end_time - env.start_time) / 1000, 2))
+    print green(u'发布完成 耗时: %s 毫秒' % time.time() - env.start_time)
 
 def ngo():
     _run_go(True)
-    end_time = int(round(time.time() * 1000))
-    print green(u'发布完成 耗时: %s秒' % round((end_time - env.start_time) / 1000, 2))
+    print green(u'发布完成 耗时: %s 毫秒' % time.time() - env.start_time)
 
 def n():
     _run_nginx()
-    end_time = int(round(time.time() * 1000))
-    print green(u'发布完成 耗时: %s秒' % round((end_time - env.start_time) / 1000, 2))
+    print green(u'发布完成 耗时: %s 毫秒' % time.time() - env.start_time)
 
 def deploy(runmode, branch, module, section):
+    env.start_time = time.time()
     cf = _load_config(section, module)
-    env.start_time = int(round(time.time() * 1000))
     if not os.path.exists(cf.source_path):
         local('mkdir -p {}'.format(cf.source_path))
 
