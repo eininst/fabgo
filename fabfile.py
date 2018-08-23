@@ -27,6 +27,16 @@ def prod(module, branch, profile=g):
     deploy('prod', branch, module, profile)
 
 
+def go():
+    _run_go()
+
+def ngo():
+    _run_go()
+    _run_nginx()
+
+def nginx():
+    _run_nginx()
+
 def deploy(runmode, branch, module, section):
     cf = _load_config(section, module)
     if not os.path.exists(cf.source_path):
@@ -52,8 +62,6 @@ def deploy(runmode, branch, module, section):
         if not host_list:
             _error(u'无效的hosts')
 
-        local('vgo clean && CC=gcc vgo build')
-        local('tar czvf {0}.tar.gz {0} conf'.format(module))
         env.hosts = ['localhost']
         env.user = cf.username
         env.password = cf.password
@@ -62,13 +70,12 @@ def deploy(runmode, branch, module, section):
         env.is_rollback = False
         env.branch = branch
 
-
-def start():
-    _run()
-
-
-def _run():
+def _run_go():
     cf = env.cf
+    with lcd(cf.source_project_path + "/" + cf.app_name):
+        local('vgo clean && CC=gcc vgo build')
+        local('tar czvf {0}.tar.gz {0} conf'.format(module))
+
     put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
     put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
@@ -102,25 +109,31 @@ def _run():
 
         print green(u'deploy success')
 
-        if not cf.nginx_path:
-            return
-        if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-            return
-        if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
-            return
 
-        if int(run('[ -e "{0}/conf/app" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
-            run('mkdir -p {0}/conf/app'.format(cf.nginx_path))
 
-        if int(run('[ -e "{0}/conf/nginx/cert" ] && echo 1 || echo 0'.format(put_remote_path))) == 1:
-            if int(run('[ -e "{0}/conf/cert" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
-                run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
-            run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(put_remote_path, cf.nginx_path))
+def _run_nginx():
+    cf = env.cf
+    put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
+    if not cf.nginx_path:
+        return
+    if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+        return
+    if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
+        return
 
-        run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{1}.conf'.format(put_remote_path, env.runmode, cf.nginx_path,
-                                                                         cf.app_name))
-        run('%s/sbin/nginx -s reload' % cf.nginx_path)
-        print green('nginx reload success!!')
+    if int(run('[ -e "{0}/conf/app" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
+        run('mkdir -p {0}/conf/app'.format(cf.nginx_path))
+
+    if int(run('[ -e "{0}/conf/nginx/cert" ] && echo 1 || echo 0'.format(put_remote_path))) == 1:
+        if int(run('[ -e "{0}/conf/cert" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
+            run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
+        run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(put_remote_path, cf.nginx_path))
+
+    run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{1}.conf'.format(put_remote_path, env.runmode, cf.nginx_path,
+                                                                          cf.app_name))
+    run('%s/sbin/nginx -s reload' % cf.nginx_path)
+    print green('nginx reload success!!')
+
 
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
