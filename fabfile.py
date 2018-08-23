@@ -94,7 +94,7 @@ def _run():
 
         # run("sh {} && sleep 0.2".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
-        run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+        run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
             ,pty=False)
 
 
