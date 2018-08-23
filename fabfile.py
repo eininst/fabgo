@@ -88,8 +88,12 @@ def _run():
         run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
 
         # echo
-        run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
-            ,pty=False)
+        rcommand = "nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+
+        run("echo {0} -> {1}.start.sh".format(rcommand,put_remote_path))
+
+        # run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+        #     ,pty=False)
 
 
 def _load_config(section, project):
