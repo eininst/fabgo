@@ -88,24 +88,24 @@ def _run():
         run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
 
         # echo
-        # rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
-        # start_sh = "{}/start.sh".format(put_remote_path)
-        # run('echo "{0}" > {1}'.format(rcommand,start_sh))
 
-        # run("sh {} && sleep 0.2".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
         r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
         if r:
             r = r.replace('\r', '')
-            # r = r.replace('^M', '')
             r = r.replace('\n', ' ')
-            # run("kill -9 %s" % r)
             run('kill -USR2 %s' % r)
         else:
+            # rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+            # start_sh = "{}/start.sh".format(put_remote_path)
+            # run('echo "{0}" > {1}'.format(rcommand,start_sh))
+            # run("set -m; sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
-            run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
+            # screen - d - m
+            run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
                 , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
+        print green(u'deploy success')
 
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
