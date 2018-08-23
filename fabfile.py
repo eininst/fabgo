@@ -75,7 +75,7 @@ def _run():
 
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
-    if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(cf.remote_path))) == 0:
+    if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
         run('mkdir -p {}'.format(cf.remote_path))
 
     result = put(put_source_path, put_remote_file)
