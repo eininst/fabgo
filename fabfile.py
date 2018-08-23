@@ -53,9 +53,8 @@ def deploy(runmode, branch, module, section):
         if not host_list:
             _error(u'无效的hosts')
 
-        local('pwd')
-        # local('vgo clean && CC=gcc vgo build')
-        # local('tar czvf {0}.tar.gz {0}'.format(module))
+        local('vgo clean && CC=gcc vgo build')
+        local('tar czvf {0}.tar.gz {0}'.format(module))
         env.hosts = ['localhost']
         env.user = cf.username
         env.password = cf.password
@@ -71,15 +70,19 @@ def start():
 
 def _run():
     cf = env.cf
-    put_remote_path = '{}/{}.tar.gz'.format(cf.remote_path, cf.app_name)
+    put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
+    put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path,cf.app_name)
+
     put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
     if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(cf.remote_path))) == 0:
         run('mkdir -p {}'.format(cf.remote_path))
 
-    result = put(put_source_path, put_remote_path)
+    result = put(put_source_path, put_remote_file)
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
+        run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+
 
 
 def _load_config(section, project):
