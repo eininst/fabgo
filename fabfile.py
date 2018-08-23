@@ -96,7 +96,7 @@ def _run():
 
         r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path,cf.app_name) )
         if r:
-            r = r.replace('\n', ' ')
+            # r = r.replace('\n', ' ')
 
             run('echo "{0}" > {1}.conf'.format(r,put_remote_path))
             run('echo "{0}"'.format(r))
