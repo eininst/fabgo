@@ -92,7 +92,7 @@ def _run():
         start_sh = "{}/start.sh".format(put_remote_path)
         run('echo "{0}" > {1}'.format(rcommand,start_sh))
 
-        run("sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
+        run("sh {} && sleep 0.2".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
         # run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
         #     ,pty=False)
