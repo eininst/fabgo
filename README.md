@@ -1,9 +1,9 @@
 # 发布脚本说明
-fab prod:q-app-web,branch=master start
+fab prod:mp,branch=master go
 
-fab prod:q-app-web,branch=master,profile=xxx start
+fab prod:mp,branch=master n
 
-fab prod:q-app-web,branch=master,is_pack=false,profile=xxx start
+fab prod:mp,branch=master ngo
 
 
 
