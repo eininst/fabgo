@@ -97,14 +97,14 @@ def _run():
         r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
         if r:
             r = r.replace('\r', '')
-            r = r.replace('^M', '')
+            # r = r.replace('^M', '')
             r = r.replace('\n', ' ')
-            run("kill -9 %s" % r)
-            run('echo "{0}" > {1}.conf'.format(r, put_remote_path))
-            run('echo "{0}"'.format(r))
-        run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name, env.runmode,
-                                                                           log_remote_path)
-            , pty=False)
+            # run("kill -9 %s" % r)
+            run('kill -USR2 %s' % r)
+        else:
+
+            run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
+                , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
 
 def _load_config(section, project):
