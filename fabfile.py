@@ -54,7 +54,7 @@ def deploy(runmode, branch, module, section):
             _error(u'无效的hosts')
 
         local('vgo clean && CC=gcc vgo build')
-        local('tar czvf {0}.tar.gz {0}'.format(module))
+        local('tar czvf {0}.tar.gz {0} conf'.format(module))
         env.hosts = ['localhost']
         env.user = cf.username
         env.password = cf.password
