@@ -102,6 +102,26 @@ def _run():
 
         print green(u'deploy success')
 
+        if not cf.nginx_path:
+            return
+        if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+            return
+        if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
+            return
+
+        if int(run('[ -e "{0}/conf/app" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
+            run('mkdir -p {0}/conf/app'.format(cf.nginx_path))
+
+        if int(run('[ -e "{0}/conf/nginx/cert" ] && echo 1 || echo 0'.format(put_remote_path))) == 1:
+            if int(run('[ -e "{0}/conf/cert" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
+                run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
+            run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(put_remote_path, cf.nginx_path))
+
+        run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{1}.conf'.format(put_remote_path, env.runmode, cf.nginx_path,
+                                                                         cf.app_name))
+        run('%s/sbin/nginx -s reload' % cf.nginx_path)
+        print green('nginx reload success!!')
+
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
     cf = ConfigParser.ConfigParser()
