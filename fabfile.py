@@ -110,7 +110,7 @@ def _run_go(n=False):
 def _run_nginx():
     cf = env.cf
     with lcd(cf.module_path):
-        local('tar czvf {0}-nginx.tar.gz conf'.format(cf.app_name))
+        local('tar czvf {0}-nginx.tar.gz conf/nginx'.format(cf.app_name))
 
         put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
