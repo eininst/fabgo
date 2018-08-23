@@ -85,7 +85,7 @@ def _run_go(n=False):
 
         result = put(put_source_path, put_remote_file)
         if result.succeeded:
-            print green(u'put success: {}'.format(put_remote_path))
+            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
             run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
             r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
             if r:
@@ -121,6 +121,7 @@ def _run_nginx():
 
         result = put(put_source_path, put_remote_file)
         if result.succeeded:
+            print green(u'put success: {} -> {}'.format(put_source_path,put_remote_path))
             _n()
 
 def _n():
