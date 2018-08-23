@@ -1,7 +1,8 @@
 
 
-s = """31257
-31258
-"""
+s = """5177^M 5178"""
 
-print s.replace("\n"," ")
+s = s.replace('\r', '')
+s = s.replace('\n', ' ')
+
+print s
