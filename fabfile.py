@@ -88,9 +88,11 @@ def _run():
         run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
 
         # echo
-        rcommand = "nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+        rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+        start_sh = "{}/start.sh".format(put_remote_path)
+        run('echo "{0}" -> {1}'.format(rcommand,start_sh))
 
-        run('echo "{0}" -> {1}.start.sh'.format(rcommand,put_remote_path))
+        run("set -m; /bin/bash {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdou)
 
         # run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
         #     ,pty=False)
