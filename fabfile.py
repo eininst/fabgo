@@ -90,9 +90,7 @@ def _run():
         # echo
         rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
         start_sh = "{}/start.sh".format(put_remote_path)
-        run('echo "{0}" -> {1}'.format(rcommand,start_sh))
-
-        cyan('echo "{0}" -> {1}'.format(rcommand,start_sh))
+        run('echo "{0}" > {1}'.format(rcommand,start_sh))
 
         run("sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
