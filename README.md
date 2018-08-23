@@ -1,12 +1,9 @@
 # 发布脚本说明
-fab prod:mp,branch=master go
+fab prod:mp,branch=master go #发布go程序
 
-fab prod:mp,branch=master n
+fab prod:mp,branch=master n #发布nginx
 
-fab prod:mp,branch=master ngo
+fab prod:mp,branch=master ngo 发布go和nginx
 
 
-
-fab rollback:prod,module=q-app-web,v=180326134415 start
-
-fab rollback:prod,module=q-app-web,v=180326134415,profile=xxx start
+fab rollback:prod,module=mp,v=180326134415 go
