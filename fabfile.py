@@ -86,7 +86,7 @@ def _run():
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
         run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
-        run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} && sleep 1".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+        run("{0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
             ,pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
 
