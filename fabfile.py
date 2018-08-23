@@ -122,6 +122,7 @@ def _run_nginx():
         result = put(put_source_path, put_remote_file)
         if result.succeeded:
             print green(u'put success: {} -> {}'.format(put_source_path,put_remote_path))
+            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
             _n()
 
 def _n():
