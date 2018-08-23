@@ -98,7 +98,7 @@ def _run():
         if r:
             r = r.replace('\t', ' ')
             r = r.replace('\n', ' ')
-
+            run("kill -9 %s" % r)
             run('echo "{0}" > {1}.conf'.format(r,put_remote_path))
             run('echo "{0}"'.format(r))
         # run("screen -d -m {0}/{1} -conf={0}/conf/{2}.yaml -log={3}".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
