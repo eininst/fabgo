@@ -25,15 +25,15 @@ def prod(module, branch, profile=g):
 
 def go():
     _run_go()
-    print cyan(u'发布完成 耗时: %s 毫秒' %  int(round(time.time() * 1000)) - int(env.start_time))
+    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
 
 def ngo():
     _run_go(True)
-    print cyan(u'发布完成 耗时: %s 毫秒' %  int(round(time.time() * 1000)) - int(env.start_time))
+    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
 
 def n():
     _run_nginx()
-    print cyan(u'发布完成 耗时: %s 毫秒' %  int(round(time.time() * 1000)) - int(env.start_time))
+    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
 
 def deploy(runmode, branch, module, section):
     env.start_time = int(round(time.time() * 1000))
