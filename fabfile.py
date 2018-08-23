@@ -27,8 +27,7 @@ def go():
     _run_go()
 
 def ngo():
-    _run_go()
-    _run_nginx()
+    _run_go(True)
 
 def n():
     _run_nginx()
@@ -66,50 +65,68 @@ def deploy(runmode, branch, module, section):
         env.is_rollback = False
         env.branch = branch
 
-def _run_go():
+def _run_go(n=False):
     cf = env.cf
-    with lcd(cf.source_project_path + "/" + cf.app_name):
+    with lcd(cf.module_path):
         local('vgo clean && CC=gcc vgo build')
         local('tar czvf {0}.tar.gz {0} conf'.format(cf.app_name))
 
-    put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
-    put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
-    put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
+        put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
+        put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
+        put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
-    log_remote_path = '{0}/logs/mp'.format(cf.remote_path)
+        log_remote_path = '{0}/logs/mp'.format(cf.remote_path)
 
-    if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-        run('mkdir -p {}'.format(put_remote_path))
+        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+            run('mkdir -p {}'.format(put_remote_path))
 
-    if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(log_remote_path))) == 0:
-        run('mkdir -p {}'.format(log_remote_path))
+        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(log_remote_path))) == 0:
+            run('mkdir -p {}'.format(log_remote_path))
 
-    result = put(put_source_path, put_remote_file)
-    if result.succeeded:
-        print green(u'put success: {}'.format(put_remote_path))
-        run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
-        r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
-        if r:
-            r = r.replace('\r', '')
-            r = r.replace('\n', ' ')
-            run('kill -USR2 %s' % r)
-        else:
-            # rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
-            # start_sh = "{}/start.sh".format(put_remote_path)
-            # run('echo "{0}" > {1}'.format(rcommand,start_sh))
-            # run("set -m; sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
+        result = put(put_source_path, put_remote_file)
+        if result.succeeded:
+            print green(u'put success: {}'.format(put_remote_path))
+            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+            r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
+            if r:
+                r = r.replace('\r', '')
+                r = r.replace('\n', ' ')
+                run('kill -USR2 %s' % r)
+            else:
+                # rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
+                # start_sh = "{}/start.sh".format(put_remote_path)
+                # run('echo "{0}" > {1}'.format(rcommand,start_sh))
+                # run("set -m; sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
-            # screen - d - m
-            run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
-                , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
+                # screen - d - m
+                run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
+                    , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
-        print green(u'deploy success')
+            print green(u'deploy success')
 
-
+        if n:
+            _n()
 
 def _run_nginx():
     cf = env.cf
-    put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
+    with lcd(cf.module_path):
+        local('tar czvf {0}-nginx.tar.gz conf'.format(cf.app_name))
+
+        put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
+        put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
+        put_source_path = '{0}/{1}-nginx.tar.gz'.format(cf.module_path, cf.app_name)
+
+        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+            run('mkdir -p {}'.format(put_remote_path))
+
+        result = put(put_source_path, put_remote_file)
+        if result.succeeded:
+            _n()
+
+def _n():
+    cf = env.cf
+    put_remote_path = cf.module_path
+
     if not cf.nginx_path:
         return
     if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
@@ -132,7 +149,6 @@ def _run_nginx():
                                                                           cf.app_name))
     run('%s/sbin/nginx -s reload' % cf.nginx_path)
     print green('nginx reload success!!')
-
 
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
