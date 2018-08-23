@@ -41,7 +41,6 @@ def deploy(runmode, branch, module, section):
         pack_cf = _load_package_config(cf)
         m = pack_cf.get(module)
 
-        print m
         if not m:
             _error(u'不存在"{}" 此项目'.format(module))
 
@@ -86,10 +85,6 @@ def _run():
     if result.succeeded:
         print green(u'put success: {}'.format(put_remote_path))
         run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
-
-        # echo
-
-
         r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
         if r:
             r = r.replace('\r', '')
