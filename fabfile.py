@@ -94,7 +94,8 @@ def _run():
 
         # run("sh {} && sleep 0.2".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
-        r = run("""ps -ef|grep {0}/{1} |grep -v 'grep' |awk '{print $2}'""".format(put_remote_path,cf.app_name))
+        run('echo "{0}"'.format("ps -ef|grep {0}/{1} |grep -v 'grep' |awk '{print $2}'".format(put_remote_path,cf.app_name)))
+        r = run("ps -ef|grep {0}/{1} |grep -v 'grep' |awk '{print $2}'".format(put_remote_path,cf.app_name))
 
         run('echo "{0}"'.format(r))
         if r:
