@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 import sys
 import threading
 import time
@@ -39,6 +40,7 @@ def task(number):
 
 def excute_command(command):
     os.system(command)
+    time.sleep((random.randint(0,30))/float(100))
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
