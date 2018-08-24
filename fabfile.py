@@ -14,6 +14,16 @@ import ConfigParser
 
 g = 'g'
 
+def task(number):
+    commands = []
+    number = int(number)
+    for i in range(number):
+        commands.append(raw_input("command: "))
+
+    yn = raw_input("确认执行吗? [Y/N]: ")
+    if yn in ["Y", "y"]:
+        for command in commands:
+            os.system(command)
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
