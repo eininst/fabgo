@@ -20,7 +20,7 @@ def task(number):
     commands = []
     number = int(number)
     for i in range(number):
-        commands.append(raw_input("command: "))
+        commands.append("fab prod:mp,branch=master n")
 
     yn = raw_input("确认执行吗? [Y/N]: ")
     if yn in ["Y", "y"]:
