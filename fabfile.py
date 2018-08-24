@@ -25,7 +25,7 @@ def task(number):
     yn = raw_input("确认执行吗? [Y/N]: ")
     if yn in ["Y", "y"]:
         for command in commands:
-            thread.start_new_thread(excute_command , (command))
+            thread.start_new_thread(excute_command , (command,))
 
 def excute_command(command):
     os.system(command)
