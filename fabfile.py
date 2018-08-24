@@ -39,8 +39,8 @@ def task(number):
         os._exit(0)
 
 def excute_command(command):
+    time.sleep((random.randint(0, 30)) / float(100))
     os.system(command)
-    time.sleep((random.randint(0,30))/float(100))
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
