@@ -35,6 +35,8 @@ def task(number):
             t.join()
 
         print green("All Task Completed!")
+        os._exit(0)
+
 def excute_command(command):
     os.system(command)
 
