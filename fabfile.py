@@ -4,6 +4,8 @@ import time
 import types
 import os
 import urllib2
+
+import thread
 import yaml
 from datetime import datetime
 from fabric.api import run, env
@@ -23,7 +25,10 @@ def task(number):
     yn = raw_input("确认执行吗? [Y/N]: ")
     if yn in ["Y", "y"]:
         for command in commands:
-            os.system(command)
+            thread.start_new_thread(excute_command , command)
+
+def excute_command(command):
+    os.system(command)
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
