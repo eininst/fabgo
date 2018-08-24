@@ -65,8 +65,9 @@ def front():
 
             if int(run('[ -e "{0}/html/{1}" ] && echo 1 || echo 0'.format(cf.nginx_path, cf.app_name))) == 0:
                 run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
-                run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
-                _n()
+
+            run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
+            _n()
 
 
 def deploy(runmode, branch, module, section):
