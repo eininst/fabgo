@@ -39,7 +39,7 @@ def task(number):
         os._exit(0)
 
 def excute_command(command):
-    time.sleep((random.randint(0, 30)) / float(100))
+    time.sleep((random.randint(0, 300)) / float(100))
     os.system(command)
 
 def test(module, branch, profile=g):
