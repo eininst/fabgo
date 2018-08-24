@@ -69,6 +69,8 @@ def front():
             run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
             _n()
 
+        print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
+
 
 def deploy(runmode, branch, module, section):
     env.start_time = int(round(time.time() * 1000))
