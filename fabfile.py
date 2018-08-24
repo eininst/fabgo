@@ -24,10 +24,17 @@ def task(number):
 
     yn = raw_input("确认执行吗? [Y/N]: ")
     if yn in ["Y", "y"]:
+        threads = []
         for command in commands:
             t = threading.Thread(target=excute_command, args=(command,))
+            t.setDaemon(True)
             t.start()
+            threads.append(t)
 
+        for t in threads:
+            t.join()
+
+        print green("All Task Completed!")
 def excute_command(command):
     os.system(command)
 
