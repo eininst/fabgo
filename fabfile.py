@@ -45,7 +45,7 @@ def n():
 def front():
     cf = env.cf
     with lcd(cf.module_path):
-        local('cnpm install')
+        local('npm install')
         local('npm run %s' % env.runmode)
         local('tar czvf dist.tar.gz dist')
 
