@@ -17,6 +17,7 @@ import ConfigParser
 
 g = 'g'
 
+
 def task(number):
     commands = []
     number = int(number)
@@ -27,7 +28,7 @@ def task(number):
     if yn in ["Y", "y"]:
         threads = []
         for command in commands:
-            t = threading.Thread(target=excute_command, args=(command,))
+            t = threading.Thread(target=_excute_command, args=(command,))
             t.setDaemon(True)
             t.start()
             threads.append(t)
@@ -38,9 +39,11 @@ def task(number):
         print green("All Task Completed!")
         os._exit(0)
 
-def excute_command(command):
+
+def _excute_command(command):
     # time.sleep((random.randint(0, 3000)) / float(100))
     os.system(command)
+
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
@@ -217,8 +220,9 @@ def _n():
             run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
         run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(cf.module_path, cf.nginx_path))
 
-    run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{4}-{1}.conf'.format(cf.module_path, env.runmode, cf.nginx_path,
-                                                                          cf.git_root_name,cf.app_name))
+    run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{4}-{1}.conf'.format(cf.module_path, env.runmode,
+                                                                              cf.nginx_path,
+                                                                              cf.git_root_name, cf.app_name))
     run('%s/sbin/nginx -s reload' % cf.nginx_path)
     print green('nginx reload success!!')
 
