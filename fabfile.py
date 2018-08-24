@@ -14,26 +14,55 @@ import ConfigParser
 
 g = 'g'
 
+
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
+
 
 def stage(module, branch, profile=g):
     deploy('stage', branch, module, profile)
 
+
 def prod(module, branch, profile=g):
     deploy('prod', branch, module, profile)
 
+
 def go():
     _run_go()
-    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
+    print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
+
 
 def ngo():
     _run_go(True)
-    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
+    print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
+
 
 def n():
     _run_nginx()
-    print cyan(u'发布完成! 耗时: %s 毫秒' %  (int(round(time.time() * 1000)) - int(env.start_time)))
+    print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
+
+
+def front():
+    cf = env.cf
+    with lcd(cf.module_path):
+        local('cnpm install')
+        local('npm run %s' % env.runmode)
+        local('tar czvf dist.tar.gz dist')
+
+        put_remote_path = '{0}/front'.format(cf.remote_path)
+        put_remote_file = '{0}/{1}_dist.tar.gz'.format(put_remote_path, cf.app_name)
+        put_source_path = '{0}/dist.tar.gz'.format(cf.module_path)
+
+
+        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+            run('mkdir -p {}'.format(put_remote_path))
+
+
+        result = put(put_source_path, put_remote_file)
+        if result.succeeded:
+            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
+
+
 
 def deploy(runmode, branch, module, section):
     env.start_time = int(round(time.time() * 1000))
@@ -53,8 +82,7 @@ def deploy(runmode, branch, module, section):
         if not m:
             _error(u'不存在"{}" 此项目'.format(module))
 
-        mode = m.get(runmode)
-        host_list = mode.get('hosts')
+        host_list = m.get(runmode)
         if not isinstance(host_list, (types.ListType, types.TupleType)):
             host_list = [host_list]
 
@@ -66,8 +94,8 @@ def deploy(runmode, branch, module, section):
         env.password = cf.password
         env.cf = cf
         env.runmode = runmode
-        env.is_rollback = False
         env.branch = branch
+
 
 def _run_go(n=False):
     cf = env.cf
@@ -103,13 +131,15 @@ def _run_go(n=False):
                 # run("set -m; sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
                 # screen - d - m
-                run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,env.runmode, log_remote_path)
+                run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,
+                                                                                           env.runmode, log_remote_path)
                     , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
             print green(u'deploy success')
 
         if n:
             _n()
+
 
 def _run_nginx():
     cf = env.cf
@@ -125,9 +155,10 @@ def _run_nginx():
 
         result = put(put_source_path, put_remote_file)
         if result.succeeded:
-            print green(u'put success: {} -> {}'.format(put_source_path,put_remote_path))
+            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
             run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
             _n()
+
 
 def _n():
     cf = env.cf
@@ -155,6 +186,7 @@ def _n():
                                                                           cf.app_name))
     run('%s/sbin/nginx -s reload' % cf.nginx_path)
     print green('nginx reload success!!')
+
 
 def _load_config(section, project):
     current_dir = os.path.dirname(__file__)
