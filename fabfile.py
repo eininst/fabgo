@@ -44,24 +44,29 @@ def n():
 
 def front():
     cf = env.cf
+
     with lcd(cf.module_path):
         local('npm install')
         local('npm run %s' % env.runmode)
         local('tar czvf dist.tar.gz dist')
 
-        put_remote_path = '{0}/front'.format(cf.remote_path)
-        put_remote_file = '{0}/{1}_dist.tar.gz'.format(put_remote_path, cf.app_name)
+        put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
+        put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
         put_source_path = '{0}/dist.tar.gz'.format(cf.module_path)
-
 
         if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
             run('mkdir -p {}'.format(put_remote_path))
-
 
         result = put(put_source_path, put_remote_file)
         if result.succeeded:
             print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
 
+            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+
+            if int(run('[ -e "{0}/html/{1}" ] && echo 1 || echo 0'.format(cf.nginx_path, cf.app_name))) == 0:
+                run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
+                run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
+                _n()
 
 
 def deploy(runmode, branch, module, section):
@@ -162,28 +167,28 @@ def _run_nginx():
 
 def _n():
     cf = env.cf
-    put_remote_path = cf.module_path
-
     if not cf.nginx_path:
         return
-    if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+    if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(cf.module_path))) == 0:
         return
-    if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
+    if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(cf.module_path, env.runmode))) == 0:
         return
 
-    if int(run('[ -e "{0}/conf/nginx/nginx.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 1:
-        run('cp -rf {0}/conf/nginx/nginx.conf {1}/conf/nginx.conf'.format(put_remote_path, cf.nginx_path))
+    if int(run('[ -e "{0}/conf/nginx/nginx.conf" ] && echo 1 || echo 0'.format(cf.module_path))) == 1:
+        run('cp -rf {0}/conf/nginx/nginx.conf {1}/conf/nginx.conf'.format(cf.module_path, cf.nginx_path))
+    elif int(run('[ -e "{0}/nginx.conf" ] && echo 1 || echo 0'.format(cf.source_project_path))) == 1:
+        run('cp -rf {0}/nginx.conf {1}/conf/nginx.conf'.format(cf.source_project_path, cf.nginx_path))
 
     if int(run('[ -e "{0}/conf/app" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
         run('mkdir -p {0}/conf/app'.format(cf.nginx_path))
 
-    if int(run('[ -e "{0}/conf/nginx/cert" ] && echo 1 || echo 0'.format(put_remote_path))) == 1:
+    if int(run('[ -e "{0}/conf/nginx/cert" ] && echo 1 || echo 0'.format(cf.module_path))) == 1:
         if int(run('[ -e "{0}/conf/cert" ] && echo 1 || echo 0'.format(cf.nginx_path))) == 0:
             run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
-        run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(put_remote_path, cf.nginx_path))
+        run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(cf.module_path, cf.nginx_path))
 
-    run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{1}.conf'.format(put_remote_path, env.runmode, cf.nginx_path,
-                                                                          cf.app_name))
+    run('cp -rf {0}/conf/nginx/{1}.conf {2}/conf/app/{3}-{4}-{1}.conf'.format(cf.module_path, env.runmode, cf.nginx_path,
+                                                                          cf.git_root_name,cf.app_name))
     run('%s/sbin/nginx -s reload' % cf.nginx_path)
     print green('nginx reload success!!')
 
