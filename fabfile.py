@@ -78,8 +78,7 @@ def front():
 
 
 def nfront():
-    _run_front()
-    _run_nginx()
+    _run_front(True)
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
 
@@ -163,7 +162,7 @@ def _run_go(n=False):
             _n(put_remote_path)
 
 
-def _run_front():
+def _run_front(n):
     cf = env.cf
 
     with lcd(cf.module_path):
@@ -192,7 +191,8 @@ def _run_front():
                 run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
 
             run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
-
+        if n:
+            _n(put_remote_file)
 
 def _run_nginx():
     cf = env.cf
