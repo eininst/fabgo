@@ -199,7 +199,7 @@ def _run_nginx():
     with lcd(cf.module_path):
         print cf.source_project_path + "/nginx.conf"
         if os.path.exists(cf.source_project_path + "/nginx.conf"):
-            local('tar czvf {0}-nginx.tar.gz conf/nginx -C {1}/nginx.conf'.format(cf.app_name, cf.source_project_path))
+            local('tar czvf {0}-nginx.tar.gz conf/nginx -C {1} nginx.conf'.format(cf.app_name, cf.source_project_path))
         else:
             local('tar czvf {0}-nginx.tar.gz conf/nginx'.format(cf.app_name))
 
