@@ -188,24 +188,25 @@ def _run_front():
 
 def _run_nginx():
     cf = env.cf
-    with lcd(cf.module_path) and os.path.exists(cf.module_path + "/nginx") and cf.nginx_path:
-        if os.path.exists(cf.source_project_path + "/nginx.conf"):
-            local('tar czvf {0}-nginx.tar.gz nginx -C {1} nginx.conf'.format(cf.app_name, cf.source_project_path))
-        else:
-            local('tar czvf {0}-nginx.tar.gz nginx'.format(cf.app_name))
+    with lcd(cf.module_path):
+        if os.path.exists("%s/nginx" % cf.module_path) and cf.nginx_path:
+            if os.path.exists(cf.source_project_path + "/nginx.conf"):
+                local('tar czvf {0}-nginx.tar.gz nginx -C {1} nginx.conf'.format(cf.app_name, cf.source_project_path))
+            else:
+                local('tar czvf {0}-nginx.tar.gz nginx'.format(cf.app_name))
 
-        put_remote_path = '/tmp/fab_nginx/{0}'.format(cf.app_name)
-        put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
-        put_source_path = '{0}/{1}-nginx.tar.gz'.format(cf.module_path, cf.app_name)
+            put_remote_path = '/tmp/fab_nginx/{0}'.format(cf.app_name)
+            put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
+            put_source_path = '{0}/{1}-nginx.tar.gz'.format(cf.module_path, cf.app_name)
 
-        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-            run('mkdir -p {}'.format(put_remote_path))
+            if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+                run('mkdir -p {}'.format(put_remote_path))
 
-        result = put(put_source_path, put_remote_file)
-        if result.succeeded:
-            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
-            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
-            _n(put_remote_path)
+            result = put(put_source_path, put_remote_file)
+            if result.succeeded:
+                print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
+                run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+                _n(put_remote_path)
 
 
 def _n(put_remote_path):
