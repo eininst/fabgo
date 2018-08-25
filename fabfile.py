@@ -225,7 +225,7 @@ def _n(put_remote_path):
             run('mkdir -p {0}/conf/cert'.format(cf.nginx_path))
         run('cp -rf {0}/conf/nginx/cert/* {1}/conf/cert/'.format(put_remote_path, cf.nginx_path))
 
-    if int(run('[ -e "{0}/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
+    if int(run('[ -e "{0}/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 1:
         run('cp -rf {0}/nginx/{1}.conf {2}/conf/app/{3}-{4}-{1}.conf'.format(put_remote_path, env.runmode,
                                                                               cf.nginx_path,
                                                                               cf.git_root_name, cf.app_name))
