@@ -73,33 +73,13 @@ def n():
 
 
 def front():
-    cf = env.cf
+    _run_front()
+    print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
-    with lcd(cf.module_path):
-        local('cnpm install')
-        local('npm run %s' % env.runmode)
-        local('tar czvf dist.tar.gz dist')
-
-        put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
-        put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
-        put_source_path = '{0}/dist.tar.gz'.format(cf.module_path)
-
-        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-            run('mkdir -p {}'.format(put_remote_path))
-
-        result = put(put_source_path, put_remote_file)
-        if result.succeeded:
-            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
-
-            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
-
-            if int(run('[ -e "{0}/html/{1}" ] && echo 1 || echo 0'.format(cf.nginx_path, cf.app_name))) == 0:
-                run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
-
-            run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
-            _n()
-
-        print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
+def nfront():
+    _run_front()
+    _n()
+    print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
 
 def deploy(runmode, branch, module, section):
@@ -126,6 +106,8 @@ def deploy(runmode, branch, module, section):
 
         if not host_list:
             _error(u'无效的hosts')
+
+        print red(host_list)
 
         env.hosts = ['localhost']
         env.user = cf.username
@@ -178,6 +160,31 @@ def _run_go(n=False):
         if n:
             _n()
 
+def _run_front():
+    cf = env.cf
+
+    with lcd(cf.module_path):
+        local('cnpm install')
+        local('npm run %s' % env.runmode)
+        local('tar czvf dist.tar.gz dist')
+
+        put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
+        put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
+        put_source_path = '{0}/dist.tar.gz'.format(cf.module_path)
+
+        if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
+            run('mkdir -p {}'.format(put_remote_path))
+
+        result = put(put_source_path, put_remote_file)
+        if result.succeeded:
+            print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
+
+            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+
+            if int(run('[ -e "{0}/html/{1}" ] && echo 1 || echo 0'.format(cf.nginx_path, cf.app_name))) == 0:
+                run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
+
+            run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
 
 def _run_nginx():
     cf = env.cf
