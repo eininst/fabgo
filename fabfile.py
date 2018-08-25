@@ -197,6 +197,7 @@ def _run_front(n):
 def _run_nginx():
     cf = env.cf
     with lcd(cf.module_path):
+        print cf.source_project_path + "/nginx.conf"
         if os.path.exists(cf.source_project_path + "/nginx.conf"):
             local('tar czvf {0}-nginx.tar.gz conf/nginx -C {1}/nginx.conf'.format(cf.app_name, cf.source_project_path))
         else:
@@ -220,7 +221,6 @@ def _n(put_remote_path):
     cf = env.cf
     if not cf.nginx_path:
         return
-
 
     if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
         return
