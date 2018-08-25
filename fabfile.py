@@ -76,6 +76,7 @@ def front():
     _run_front()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
+
 def nfront():
     _run_front()
     _run_nginx()
@@ -119,7 +120,10 @@ def _run_go(n=False):
     cf = env.cf
     with lcd(cf.module_path):
         local('vgo clean && CC=gcc vgo build')
-        local('tar czvf {0}.tar.gz {0} conf'.format(cf.app_name))
+        if os.path.exists(cf.source_project_path + "/nginx.conf"):
+            local('tar czvf {0}.tar.gz {0} conf -C {1}/nginx.conf'.format(cf.app_name, cf.source_project_path))
+        else:
+            local('tar czvf {0}.tar.gz {0} conf'.format(cf.app_name))
 
         put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
@@ -158,13 +162,18 @@ def _run_go(n=False):
         if n:
             _n(put_remote_path)
 
+
 def _run_front():
     cf = env.cf
 
     with lcd(cf.module_path):
         local('cnpm install')
         local('npm run %s' % env.runmode)
-        local('tar czvf dist.tar.gz dist conf')
+
+        if os.path.exists(cf.source_project_path + "/nginx.conf"):
+            local('tar czvf dist.tar.gz dist conf -C %s/nginx.conf' % cf.source_project_path)
+        else:
+            local('tar czvf dist.tar.gz dist conf')
 
         put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
@@ -184,10 +193,14 @@ def _run_front():
 
             run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
 
+
 def _run_nginx():
     cf = env.cf
     with lcd(cf.module_path):
-        local('tar czvf {0}-nginx.tar.gz conf/nginx'.format(cf.app_name))
+        if os.path.exists(cf.source_project_path + "/nginx.conf"):
+            local('tar czvf {0}-nginx.tar.gz conf/nginx -C {1}/nginx.conf'.format(cf.app_name, cf.source_project_path))
+        else:
+            local('tar czvf {0}-nginx.tar.gz conf/nginx'.format(cf.app_name))
 
         put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
@@ -207,6 +220,8 @@ def _n(put_remote_path):
     cf = env.cf
     if not cf.nginx_path:
         return
+
+
     if int(run('[ -e "{}/conf/nginx" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
         return
     if int(run('[ -e "{0}/conf/nginx/{1}.conf" ] && echo 1 || echo 0'.format(put_remote_path, env.runmode))) == 0:
