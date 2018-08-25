@@ -199,8 +199,8 @@ def _run_nginx():
             put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
             put_source_path = '{0}/{1}-nginx.tar.gz'.format(cf.module_path, cf.app_name)
 
-            if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-                run('mkdir -p {}'.format(put_remote_path))
+            run("rm -rf {0}".format(put_remote_path))
+            run('mkdir -p {}'.format(put_remote_path))
 
             result = put(put_source_path, put_remote_file)
             if result.succeeded:
