@@ -107,7 +107,7 @@ def deploy(runmode, branch, module, section):
         if not host_list:
             _error(u'无效的hosts')
 
-        env.hosts = [host_list]
+        env.hosts = host_list
         env.user = cf.username
         env.password = cf.password
         env.cf = cf
