@@ -78,7 +78,8 @@ def front():
 
 
 def nfront():
-    _run_front(True)
+    _run_front()
+    _run_nginx()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
 
@@ -162,17 +163,13 @@ def _run_go(n=False):
             _n(put_remote_path)
 
 
-def _run_front(n):
+def _run_front():
     cf = env.cf
 
     with lcd(cf.module_path):
         local('cnpm install')
         local('npm run %s' % env.runmode)
-
-        if os.path.exists(cf.source_project_path + "/nginx.conf"):
-            local('tar czvf dist.tar.gz dist conf -C %s/nginx.conf' % cf.source_project_path)
-        else:
-            local('tar czvf dist.tar.gz dist conf')
+        local('tar czvf dist.tar.gz dist')
 
         put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
@@ -191,8 +188,7 @@ def _run_front(n):
                 run('mkdir -p {0}/html/{1}'.format(cf.nginx_path, cf.app_name))
 
             run('cp -rf {0}/dist/* {1}/html/{2}'.format(put_remote_path, cf.nginx_path, cf.app_name))
-        if n:
-            _n(put_remote_file)
+
 
 def _run_nginx():
     cf = env.cf
