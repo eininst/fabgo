@@ -63,7 +63,8 @@ def go():
 
 
 def ngo():
-    _run_go(True)
+    _run_go()
+    _run_nginx()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
 
@@ -116,7 +117,7 @@ def deploy(runmode, branch, module, section):
         env.branch = branch
 
 
-def _run_go(n=False):
+def _run_go():
     cf = env.cf
     with lcd(cf.module_path):
         local('vgo clean && CC=gcc vgo build')
@@ -158,9 +159,6 @@ def _run_go(n=False):
                     , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
             print green(u'deploy success')
-
-        if n:
-            _n(put_remote_path)
 
 
 def _run_front():
