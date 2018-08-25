@@ -195,7 +195,7 @@ def _run_nginx():
             else:
                 local('tar czvf {0}-nginx.tar.gz nginx'.format(cf.app_name))
 
-            put_remote_path = '/tmp/fab_nginx/{0}'.format(cf.app_name)
+            put_remote_path = '/tmp/fab_nginx/{0}/{1}'.format(cf.git_root_name,cf.app_name)
             put_remote_file = '{0}/{1}-nginx.tar.gz'.format(put_remote_path, cf.app_name)
             put_source_path = '{0}/{1}-nginx.tar.gz'.format(cf.module_path, cf.app_name)
 
