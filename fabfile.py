@@ -167,7 +167,7 @@ def _run_front():
         local('npm run %s' % env.runmode)
         local('tar czvf dist.tar.gz dist')
 
-        put_remote_path = '{0}/front/{1}'.format(cf.remote_path, cf.app_name)
+        put_remote_path = '{0}/{1}'.format(cf.remote_path, cf.app_name)
         put_remote_file = '{0}/dist.tar.gz'.format(put_remote_path)
         put_source_path = '{0}/dist.tar.gz'.format(cf.module_path)
 
