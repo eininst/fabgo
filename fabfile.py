@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
-import random
 import sys
 import threading
 import time
 import types
 import os
-import urllib2
 
 import yaml
 from datetime import datetime
 from fabric.api import run, env
 from fabric.operations import local, put
-from fabric.context_managers import lcd, cd
+from fabric.context_managers import lcd
 from fabric.colors import green, red, cyan
 import ConfigParser
 
 g = 'g'
-
 
 def task(number):
     commands = []
@@ -41,42 +38,33 @@ def task(number):
 
 
 def _excute_command(command):
-    # time.sleep((random.randint(0, 3000)) / float(100))
     os.system(command)
-
 
 def test(module, branch, profile=g):
     deploy('test', branch, module, profile)
 
-
 def stage(module, branch, profile=g):
     deploy('stage', branch, module, profile)
-
 
 def prod(module, branch, profile=g):
     deploy('prod', branch, module, profile)
 
-
 def go():
     _run_go()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
-
 
 def ngo():
     _run_go()
     _run_nginx()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
-
 def n():
     _run_nginx()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
 
-
 def front():
     _run_front()
     print cyan(u'发布完成! 耗时: %s 毫秒' % (int(round(time.time() * 1000)) - int(env.start_time)))
-
 
 def nfront():
     _run_front()
@@ -115,6 +103,7 @@ def deploy(runmode, branch, module, section):
         env.cf = cf
         env.runmode = runmode
         env.branch = branch
+        env.key_filename = cf.key_filename
 
 
 def _run_go():
@@ -128,23 +117,24 @@ def _run_go():
         put_remote_file = '{0}/{1}.tar.gz'.format(put_remote_path, cf.app_name)
         put_source_path = '{}/{}.tar.gz'.format(cf.module_path, cf.app_name)
 
-        log_remote_path = '{0}/logs/mp'.format(cf.remote_path)
+        log_remote_path = '{0}/logs/{1}'.format(cf.remote_path, cf.app_name)
 
         if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(put_remote_path))) == 0:
-            run('mkdir -p {}'.format(put_remote_path))
-
+            run('sudo mkdir -p {}'.format(put_remote_path))
+            print 'xxx'
+        print 'xxx2'
         if int(run('[ -e "{}" ] && echo 1 || echo 0'.format(log_remote_path))) == 0:
-            run('mkdir -p {}'.format(log_remote_path))
+            run('sudo mkdir -p {}'.format(log_remote_path))
 
-        result = put(put_source_path, put_remote_file)
+        result = put(put_source_path, put_remote_file,use_sudo=True)
         if result.succeeded:
             print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
-            run("tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
+            run("sudo tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
             r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
             if r:
                 r = r.replace('\r', '')
                 r = r.replace('\n', ' ')
-                run('kill -USR2 %s' % r)
+                run('sudo kill -USR2 %s' % r)
             else:
                 # rcommand = "{0}/{1} -conf={0}/conf/{2}.yaml -log={3} &".format(put_remote_path, cf.app_name,env.runmode,log_remote_path)
                 # start_sh = "{}/start.sh".format(put_remote_path)
@@ -152,7 +142,7 @@ def _run_go():
                 # run("set -m; sh {}".format(start_sh) , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
                 # screen - d - m
-                run("nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,
+                run("sudo nohup {0}/{1} -conf={0}/conf/{2}.yaml -log={3} &> /dev/null &".format(put_remote_path, cf.app_name,
                                                                                            env.runmode, log_remote_path)
                     , pty=False, warn_only=True, stdout=sys.stdout, stderr=sys.stdout)
 
@@ -277,8 +267,11 @@ def _load_config(section, project):
         config.password = cf.get(section, 'password')
     elif cf.has_option(g, 'password'):
         config.password = cf.get(g, 'password')
-    else:
-        _error(u'password不能为空')
+
+    if cf.has_option(section, 'key_filename'):
+        config.key_filename = cf.get(section, 'key_filename')
+    elif cf.has_option(g, 'key_filename'):
+        config.key_filename = cf.get(g, 'key_filename')
 
     if cf.has_option(section, 'nginx'):
         config.nginx_path = cf.get(section, 'nginx')
@@ -330,6 +323,7 @@ class Config:
     git_root = None
     username = None
     password = None
+    key_filename = None
     source_path = None
     source_project_path = None
     remote_path = None
