@@ -129,6 +129,7 @@ def _run_go():
         result = put(put_source_path, put_remote_file,use_sudo=True)
         if result.succeeded:
             print green(u'put success: {} -> {}'.format(put_source_path, put_remote_path))
+            run("rm -rf {}/conf".format(put_remote_path))
             run("sudo tar -xvzf {0} -C {1}".format(put_remote_file, put_remote_path))
             r = run("ps -ef|grep %s/%s |grep -v 'grep' |awk '{print $2}'" % (put_remote_path, cf.app_name))
             if r:
